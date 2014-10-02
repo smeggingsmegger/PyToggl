@@ -30,35 +30,55 @@ users = pytoggl.get_workspace_users(workspaces[0].id)
 # helper methods (ie. get_workspaces and get_workspace_users)
 
 print(users[0].name)
+```
 
-> John Smith
+```
+John Smith
+```
 
+```python
+# The repr is very useful for debugging.
 print(users[0])
+```
 
-> class instance>.wid = 12345
-> class instance>.uid = 543210
-> class instance>.admin = False
-> class instance>.avatar_file_name = https://secure.gravatar.com/avatar/87vh8r7h8er7ch8wd7ch9wd7cj9wr7h?d=404&s=200
-> class instance>.id = 987656789
-> class instance>.inactive = False
-> class instance>.at = 2014-09-26T17:54:54+00:00
-> class instance>.active = True
-> class instance>.group_ids = [345678]
-> class instance>.email = johnsmith@notarealdomain.com
-> class instance>.name = John Smith
+```
+class instance>.wid = 12345
+class instance>.uid = 543210
+class instance>.admin = False
+class instance>.avatar_file_name = https://secure.gravatar.com/avatar/87vh8r7h8er7ch8wd7ch9wd7cj9wr7h?d=404&s=200
+class instance>.id = 987656789
+class instance>.inactive = False
+class instance>.at = 2014-09-26T17:54:54+00:00
+class instance>.active = True
+class instance>.group_ids = [345678]
+class instance>.email = johnsmith@notarealdomain.com
+class instance>.name = John Smith
+```
 
+```python
+# All objects have a dict property.
 print(users[0].dict)
+```
 
-> {'active': True,
-> 'admin': False,
-> 'at': u'2014-09-26T17:54:54+00:00',
-> 'avatar_file_name': u'https://secure.gravatar.com/avatar/87vh8r7h8er7ch8wd7ch9wd7cj9wr7h?d=404&s=200',
-> 'email': u'johnsmith@notarealdomain.com',
-> 'group_ids': [345678],
-> 'id': 987656789,
-> 'inactive': False,
-> 'name': u'John Smith',
-> 'uid': 543210,
-> 'wid': 12345}
+```
+{'active': True,
+'admin': False,
+'at': u'2014-09-26T17:54:54+00:00',
+'avatar_file_name': u'https://secure.gravatar.com/avatar/87vh8r7h8er7ch8wd7ch9wd7cj9wr7h?d=404&s=200',
+'email': u'johnsmith@notarealdomain.com',
+'group_ids': [345678],
+'id': 987656789,
+'inactive': False,
+'name': u'John Smith',
+'uid': 543210,
+'wid': 12345}
+```
 
+```python
+# All objects also have a json property
+
+print(users[0].json)
+```
+```
+'{"wid": 12345, "uid": 543210, "avatar_file_name": "https://secure.gravatar.com/avatar/87vh8r7h8er7ch8wd7ch9wd7cj9wr7h?d=404&s=200", "inactive": false, "at": "2014-09-26T17:54:54+00:00", "active": true, "id": 987656789, "group_ids": [345678], "name": "John Smith", "admin": false, "email": "johnsmith@notarealdomain.com"}'
 ```
