@@ -32,6 +32,7 @@ users = pytoggl.get_workspace_users(workspaces[0].id)
 print(users[0].name)
 ```
 
+Output:
 ```
 John Smith
 ```
@@ -41,6 +42,7 @@ John Smith
 print(users[0])
 ```
 
+Output:
 ```
 class instance>.wid = 12345
 class instance>.uid = 543210
@@ -60,6 +62,7 @@ class instance>.name = John Smith
 print(users[0].dict)
 ```
 
+Output:
 ```
 {'active': True,
 'admin': False,
@@ -79,6 +82,8 @@ print(users[0].dict)
 
 print(users[0].json)
 ```
+
+Output:
 ```
 '{"wid": 12345, "uid": 543210, "avatar_file_name": "https://secure.gravatar.com/avatar/87vh8r7h8er7ch8wd7ch9wd7cj9wr7h?d=404&s=200", "inactive": false, "at": "2014-09-26T17:54:54+00:00", "active": true, "id": 987656789, "group_ids": [345678], "name": "John Smith", "admin": false, "email": "johnsmith@notarealdomain.com"}'
 ```

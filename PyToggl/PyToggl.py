@@ -102,6 +102,34 @@ class PyToggl:
         else:
             return response
 
+    def _get_timeslips(self, user_id, workspace_id, start=None, end=None, page=None):
+        if not start:
+            start = self.today_str
+
+        if not end:
+            end = self.today_str
+
+        if not page:
+            page = 1
+
+        print("Getting slips for page {}".format(page))
+        print("Getting >= start {}".format(start))
+        print("Getting <= end {}".format(end))
+        params = {
+            'since': start,
+            'until': end,
+            'user_agent': self.user_agent,
+            'user_ids': user_id,
+            'grouping': 'users',
+            'subgrouping': 'projects',
+            'workspace_id': workspace_id,
+            'page': page,
+            'order_field': 'date',
+        }
+        response = self.query_report('/details', params)
+        return response
+
+
     '''
     Primary Methods
 
@@ -180,34 +208,7 @@ class PyToggl:
         return user
 
     # TimeSlips (detailed report)
-    def _get_timeslips(self, user_id, workspace_id, start=None, end=None, page=None):
-        if not start:
-            start = self.today_str
-
-        if not end:
-            end = self.today_str
-
-        if not page:
-            page = 1
-
-        print("Getting slips for page {}".format(page))
-        print("Getting >= start {}".format(start))
-        print("Getting <= end {}".format(end))
-        params = {
-            'since': start,
-            'until': end,
-            'user_agent': self.user_agent,
-            'user_ids': user_id,
-            'grouping': 'users',
-            'subgrouping': 'projects',
-            'workspace_id': workspace_id,
-            'page': page,
-            'order_field': 'date',
-        }
-        response = self.query_report('/details', params)
-        return response
-
-    def get_all_timeslips(self, user_id, workspace_id, start=None, end=None):
+    def get_timeslips(self, user_id, workspace_id, start=None, end=None):
         if not start:
             start = self.today_str
 
@@ -258,7 +259,7 @@ class Toggject:
     def __repr__(self):
         reflection = ''
         for attr in vars(self):
-            reflection += "<class instance>.{} = {}\n".format(attr, getattr(self, attr))
+            reflection += "<{}>.{} = {}\n".format(self.__class__.__name__, attr, getattr(self, attr))
         return reflection
 
     @property
