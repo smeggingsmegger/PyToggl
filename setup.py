@@ -46,7 +46,7 @@ if os.path.exists('README.txt'):
 
 setup(
     name='PyToggl',
-    version='0.2.1',
+    version='0.2.2',
     url='http://github.com/smeggingsmegger/PyToggl',
     license='MIT',
     author='Scott Blevins',
