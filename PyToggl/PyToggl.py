@@ -1,6 +1,7 @@
 import requests
 
 from datetime import datetime
+from json import dumps
 
 class PyToggl:
     '''
@@ -33,6 +34,11 @@ class PyToggl:
         # Credentials
         self.api_token = api_token
 
+        # The Toggl API is a little strange in that it has the concept of "Me"
+        # Although you can query users that are attached to a workspace that "Me"
+        # owns (or possibly is an admin of).
+        self.me = None
+
         # All other options, overridable by kwargs.
         for key in self.defaults:
             setattr(self, key, kwargs.get(key, self.defaults.get(key, None)))
@@ -41,6 +47,10 @@ class PyToggl:
         self.api_url = self.api_base_url + '/v' + str(self.api_version)
         self.api_reports_url = self.api_base_reports_url + '/v' + str(self.api_reports_version)
         self.today_str = str(datetime.now().date())
+
+    '''
+    Internal methods for doing things and abstracting away typical API copy-pasta.
+    '''
 
     def _human_duration(self, t, milliseconds=True):
         if milliseconds:
@@ -66,17 +76,6 @@ class PyToggl:
             output += '{} Minutes, '.format(duration[3])
         output += '{} Seconds'.format(duration[4])
         return output
-
-    '''
-    Primary Methods
-
-    self.query and self.query_report can be used to perform any API call.
-    '''
-    def query_report(self, url, params={}, method='GET', return_type='json'):
-        return self._query(url, params, method, query_type='report', return_type=return_type)
-
-    def query(self, url, params={}, method='GET', query_type='report', return_type='json'):
-        return self._query(url, params, method, return_type=return_type)
 
     def _query(self, url, params, method, query_type=None, return_type='json'):
         if query_type == 'report':
@@ -104,6 +103,17 @@ class PyToggl:
             return response
 
     '''
+    Primary Methods
+
+    self.query and self.query_report can be used to perform any API call.
+    '''
+    def query_report(self, url, params={}, method='GET', return_type='json'):
+        return self._query(url, params, method, query_type='report', return_type=return_type)
+
+    def query(self, url, params={}, method='GET', query_type='report', return_type='json'):
+        return self._query(url, params, method, return_type=return_type)
+
+    '''
     Convenience Methods
     '''
 
@@ -122,6 +132,7 @@ class PyToggl:
 
         return workspace
 
+    # Workspaces / Users
     def get_workspace_users(self, workspace_id):
         if not workspace_id:
             raise UserWarning('A workspace ID is required to find users.')
@@ -184,6 +195,13 @@ class Toggject:
             reflection += "<class instance>.{} = {}\n".format(attr, getattr(self, attr))
         return reflection
 
+    @property
+    def dict(self):
+        return self.__dict__
+
+    @property
+    def json(self):
+        return dumps(self.__dict__)
 
 class Group(Toggject):
     pass
