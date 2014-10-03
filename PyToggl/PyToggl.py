@@ -103,7 +103,7 @@ class PyToggl:
         else:
             return response
 
-    def _get_timeslips(self, user_id, workspace_id, start=None, end=None, page=None):
+    def _get_timeslips(self, user_id=None, workspace_id=None, start=None, end=None, page=None):
         if not start:
             start = self.today_str
 
@@ -206,7 +206,7 @@ class PyToggl:
         return user
 
     # TimeSlips (detailed report)
-    def get_timeslips(self, user_id, workspace_id, start=None, end=None):
+    def get_timeslips(self, user_id=None, workspace_id=None, start=None, end=None):
         if not start:
             start = self.today_str
 
@@ -295,9 +295,16 @@ class TimeSlip(Toggject):
         '''
         Looks for any of the following trac ticket formats in the description field:
 
-            t12345, t 12345, T12345, T 12345, #12345, # 12345
+            t12345, t 12345, T12345, T 12345, #12345, # 12345, ticket 12345, TICKET 12345
         '''
-        return re.findall(r"[tT#]\s?[0-9]+", self.description)
+        ticket_numbers = re.findall(r"^[tT#]\s?[0-9]+", self.description)
+        ticket_numbers += re.findall(r"[tT#][0-9]+", self.description)
+        ticket_numbers += re.findall(re.compile("ticket\s?[0-9]+", re.IGNORECASE), self.description)
+
+        # Remove Duplicates
+        ticket_numbers = [re.sub('[^0-9]','', t) for t in ticket_numbers]
+        return list(set(ticket_numbers))
+
 
     @property
     def pull_requests(self):
