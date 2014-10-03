@@ -37,6 +37,7 @@ Output:
 John Smith
 ```
 
+Code:
 ```python
 # The repr is very useful for debugging.
 print(users[0])
@@ -57,6 +58,8 @@ class instance>.email = johnsmith@notarealdomain.com
 class instance>.name = John Smith
 ```
 
+
+Code:
 ```python
 # All objects have a dict property.
 print(users[0].dict)
@@ -77,9 +80,9 @@ Output:
 'wid': 12345}
 ```
 
+Code:
 ```python
 # All objects also have a json property
-
 print(users[0].json)
 ```
 

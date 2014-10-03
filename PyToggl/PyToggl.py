@@ -1,3 +1,4 @@
+import re
 import requests
 
 from datetime import datetime
@@ -112,9 +113,6 @@ class PyToggl:
         if not page:
             page = 1
 
-        print("Getting slips for page {}".format(page))
-        print("Getting >= start {}".format(start))
-        print("Getting <= end {}".format(end))
         params = {
             'since': start,
             'until': end,
@@ -220,7 +218,6 @@ class PyToggl:
         data = response['data']
         per_page = response['per_page']
         total_count = response['total_count']
-        print("Found {} Timeslips".format(total_count))
 
         if data:
             for row in data:
@@ -232,7 +229,6 @@ class PyToggl:
             if total_count % per_page:
                 total_pages += 1
 
-            print("Found {} Pages".format(total_pages))
             for current_page in range(total_pages):
                 page = current_page + 1
                 if page > 1:
@@ -293,6 +289,24 @@ class TimeSlip(Toggject):
     use_stop = True
     id = 0
     cur = 'USD'
+
+    @property
+    def trac_tickets(self):
+        '''
+        Looks for any of the following trac ticket formats in the description field:
+
+            t12345, t 12345, T12345, T 12345, #12345, # 12345
+        '''
+        return re.findall(r"^[tT#]\s?[0-9]+", self.description)
+
+    @property
+    def pull_requests(self):
+        '''
+        Looks for any of the following pull request formats in the description field:
+
+            pr12345, pr 2345, PR2345, PR 2345
+        '''
+        return re.findall(r"[pP][rR]\s?[0-9]+", self.description)
 
 
 class User(Toggject):
