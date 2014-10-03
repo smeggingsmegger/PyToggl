@@ -297,7 +297,7 @@ class TimeSlip(Toggject):
 
             t12345, t 12345, T12345, T 12345, #12345, # 12345
         '''
-        return re.findall(r"^[tT#]\s?[0-9]+", self.description)
+        return re.findall(r"[tT#]\s?[0-9]+", self.description)
 
     @property
     def pull_requests(self):
