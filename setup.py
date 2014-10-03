@@ -45,7 +45,7 @@ if os.path.exists('README.txt'):
     long_description = open('README.txt').read()
 
 setup(
-    name='PyToggl'
+    name='PyToggl',
     version='0.1.0',
     url='http://github.com/smeggingsmegger/PyToggl',
     license='MIT',
