@@ -117,10 +117,10 @@ class PyToggl:
     Convenience Methods
     '''
 
-    # Workspaces
+    # WorkSpaces
     def get_workspaces(self):
         workspaces = self.query('/workspaces')
-        return [Workspace(w) for w in workspaces]
+        return [WorkSpace(w) for w in workspaces]
 
     def get_workspace(self, identifier_value, identifier='name'):
         workspace = None
@@ -132,7 +132,7 @@ class PyToggl:
 
         return workspace
 
-    # Workspaces / Users
+    # WorkSpaces / Users
     def get_workspace_users(self, workspace_id):
         if not workspace_id:
             raise UserWarning('A workspace ID is required to find users.')
@@ -158,6 +158,7 @@ class PyToggl:
             'workspace_id': workspace_id,
         }
         response = self.query_report('/summary', params)
+        import pudb; pudb.set_trace()  # XXX BREAKPOINT
 
         total = 0
         if len(response['data']) > 0:
@@ -177,6 +178,71 @@ class PyToggl:
                 user = u
 
         return user
+
+    # TimeSlips (detailed report)
+    def _get_timeslips(self, user_id, workspace_id, start=None, end=None, page=None):
+        if not start:
+            start = self.today_str
+
+        if not end:
+            end = self.today_str
+
+        if not page:
+            page = 1
+
+        print("Getting slips for page {}".format(page))
+        print("Getting >= start {}".format(start))
+        print("Getting <= end {}".format(end))
+        params = {
+            'since': start,
+            'until': end,
+            'user_agent': self.user_agent,
+            'user_ids': user_id,
+            'grouping': 'users',
+            'subgrouping': 'projects',
+            'workspace_id': workspace_id,
+            'page': page,
+            'order_field': 'date',
+        }
+        response = self.query_report('/details', params)
+        return response
+
+    def get_all_timeslips(self, user_id, workspace_id, start=None, end=None):
+        if not start:
+            start = self.today_str
+
+        if not end:
+            end = self.today_str
+
+        timeslips = []
+        response = self._get_timeslips(user_id, workspace_id, start, end)
+        data = response['data']
+        per_page = response['per_page']
+        total_count = response['total_count']
+        print("Found {} Timeslips".format(total_count))
+
+        if data:
+            for row in data:
+                timeslips.append(TimeSlip(row))
+
+        if total_count > per_page:
+            # There are more records than can be returned in one go-round.
+            total_pages = total_count / per_page
+            if total_count % per_page:
+                total_pages += 1
+
+            print("Found {} Pages".format(total_pages))
+            for current_page in range(total_pages):
+                page = current_page + 1
+                if page > 1:
+                    response = self._get_timeslips(user_id, workspace_id, start, end, page)
+                    data = response['data']
+                    if data:
+                        for row in data:
+                            timeslips.append(TimeSlip(row))
+
+        return timeslips
+
 
 '''
 Classes for return objects from the API.
@@ -207,8 +273,25 @@ class Group(Toggject):
     pass
 
 
-class Timeslip(Toggject):
-    pass
+class TimeSlip(Toggject):
+    updated = ''
+    task = None
+    end = ''
+    description = ''
+    tags = []
+    billable = 0.0
+    pid = 0
+    project = ''
+    start = ''
+    client = None
+    user = ''
+    is_billable = False
+    tid = None
+    uid = 0
+    dur = 0
+    use_stop = True
+    id = 0
+    cur = 'USD'
 
 
 class User(Toggject):
@@ -226,7 +309,7 @@ class User(Toggject):
     wid = 0
 
 
-class Workspace(Toggject):
+class WorkSpace(Toggject):
     # Default properties, here for reference if nothing else.
     id = 0
     default_currency = 'USD'
