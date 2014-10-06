@@ -103,28 +103,22 @@ class PyToggl:
         else:
             return response
 
-    def _get_timeslips(self, user_id=None, workspace_id=None, start=None, end=None, page=None):
-        if not start:
-            start = self.today_str
-
-        if not end:
-            end = self.today_str
-
-        if not page:
-            page = 1
-
+    def _get_timeslips(self, **kwargs):
+        order_field = kwargs.get('order_field', 'date')
+        subgrouping = kwargs.get('subgrouping', 'projects')
+        grouping = kwargs.get('grouping', 'users')
         params = {
-            'since': start,
-            'until': end,
             'user_agent': self.user_agent,
-            'user_ids': user_id,
-            'grouping': 'users',
-            'subgrouping': 'projects',
-            'workspace_id': workspace_id,
-            'page': page,
-            'order_field': 'date',
+            'grouping': grouping,
+            'subgrouping': subgrouping,
+            'order_field': order_field,
         }
+        for key in kwargs:
+            if not params.get(key):
+                params[key] = kwargs.get(key)
+
         response = self.query_report('/details', params)
+
         return response
 
 
@@ -167,24 +161,19 @@ class PyToggl:
         return [User(u) for u in users]
 
     # Users
-    def get_user_hours(self, user_id, workspace_id, start=None, end=None):
-        if not start:
-            start = self.today_str
-
-        if not end:
-            end = self.today_str
-
+    def get_user_hours(self, **kwargs):
+        subgrouping = kwargs.get('subgrouping', 'projects')
+        grouping = kwargs.get('grouping', 'users')
         params = {
-            'since': start,
-            'until': end,
             'user_agent': self.user_agent,
-            'user_ids': user_id,
-            'grouping': 'users',
-            'subgrouping': 'projects',
-            'workspace_id': workspace_id,
+            'grouping': grouping,
+            'subgrouping': subgrouping,
         }
+        for key in kwargs:
+            if not params.get(key):
+                params[key] = kwargs.get(key)
+
         response = self.query_report('/summary', params)
-        import pudb; pudb.set_trace()  # XXX BREAKPOINT
 
         total = 0
         if len(response['data']) > 0:
@@ -206,15 +195,9 @@ class PyToggl:
         return user
 
     # TimeSlips (detailed report)
-    def get_timeslips(self, user_id=None, workspace_id=None, start=None, end=None):
-        if not start:
-            start = self.today_str
-
-        if not end:
-            end = self.today_str
-
+    def get_timeslips(self, **kwargs):
         timeslips = []
-        response = self._get_timeslips(user_id, workspace_id, start, end)
+        response = self._get_timeslips(**kwargs)
         data = response['data']
         per_page = response['per_page']
         total_count = response['total_count']
@@ -232,7 +215,7 @@ class PyToggl:
             for current_page in range(total_pages):
                 page = current_page + 1
                 if page > 1:
-                    response = self._get_timeslips(user_id, workspace_id, start, end, page)
+                    response = self._get_timeslips(page=page, **kwargs)
                     data = response['data']
                     if data:
                         for row in data:
@@ -297,6 +280,7 @@ class TimeSlip(Toggject):
 
             t12345, t 12345, T12345, T 12345, #12345, # 12345, ticket 12345, TICKET 12345
         '''
+        # ticket_numbers = re.findall(re.compile("([t#]\s?[0-9]{2,})|([t#][0-9]{2,})", re.IGNORECASE), self.description)
         ticket_numbers = re.findall(r"^[tT#]\s?[0-9]+", self.description)
         ticket_numbers += re.findall(r"[tT#][0-9]+", self.description)
         ticket_numbers += re.findall(re.compile("ticket\s?[0-9]+", re.IGNORECASE), self.description)
@@ -313,7 +297,12 @@ class TimeSlip(Toggject):
 
             pr12345, pr 2345, PR2345, PR 2345
         '''
-        return re.findall(r"[pP][rR]\s?[0-9]+", self.description)
+        pr_numbers = re.findall(r"[pP][rR]\s?[0-9]+", self.description)
+        pr_numbers += re.findall(re.compile("pull\s?request\s?[0-9]+", re.IGNORECASE), self.description)
+
+        # Remove Duplicates
+        pr_numbers = [re.sub('[^0-9]','', p) for p in pr_numbers]
+        return pr_numbers
 
 
 class User(Toggject):

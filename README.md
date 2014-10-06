@@ -1,8 +1,6 @@
-PyToggl
-=======
+#PyToggl
 
-The definitive Toggl library for Python.
--------
+#####The definitive Toggl library for Python.
 
 Currently this library supports all API calls via the self.query and the self.query_report methods. They return the JSON that is documented in the Toggl API documentation.
 
@@ -25,7 +23,10 @@ workspaces = pytoggl.get_workspaces()
 
 # Now grab all our users for the first workspace
 users = pytoggl.get_workspace_users(workspaces[0].id)
+```
 
+Code:
+```python
 # PyToggl creates objects out of all your query results that use the
 # helper methods (ie. get_workspaces and get_workspace_users)
 
