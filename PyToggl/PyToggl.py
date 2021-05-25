@@ -24,8 +24,8 @@ class PyToggl:
         'api_username': '',
         'api_password': '',
         'api_workspace_name': '',
-        'api_base_url': 'https://www.toggl.com/api',
-        'api_base_reports_url': 'https://toggl.com/reports/api',
+        'api_base_url': 'https://api.track.toggl.com/api',
+        'api_base_reports_url': 'https://api.track.toggl.com/reports/api',
         'user_agent': 'The PyToggl Library - https://github.com/smeggingsmegger/PyToggl',
     }
 
